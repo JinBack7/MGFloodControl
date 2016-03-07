@@ -135,6 +135,42 @@ namespace MGFloodControl
                     break;
             }
         }
+
+        public string[] GetOtherEnds(string startingEnd)
+        {
+            List<string> opposites = new List<string>();
+
+            foreach (string end in pieceType.Split(','))
+            {
+                if (end != startingEnd) 
+                {
+                    opposites.Add(end);
+                }
+            }
+
+            return opposites.ToArray();
+        }
+
+        public bool HasConnector(string direction)
+        {
+            return pieceType.Contains(direction);
+        }
+
+        public Rectangle GetSourceRect() 
+        {
+            int x = textureOffsetX;
+            int y = textureOffsetY;
+
+            if (pieceSuffix.Contains("W")) 
+            {
+                x = +PieceWidth + texturePaddingX;
+            }
+
+            y += (Array.IndexOf(PieceTypes, pieceType) * (PieceHeight + texturePaddingY));
+
+            return new Rectangle(x, y, PieceWidth, PieceHeight);
+        }
+
     }
 
     
