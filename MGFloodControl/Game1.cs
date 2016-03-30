@@ -84,7 +84,37 @@ namespace MGFloodControl
                 Exit();
 
             // TODO: Add your update logic here
+            switch (gameState)
+            {
+                case GameStates.TitleScreen:
+                    if (Keyboard.GetState().IsKeyDown(Keys.Space))
+                    {
+                        gameBoard.ClearBoard();
+                        gameBoard.GenerateNewPieces(false);
+                        playerScore = 0;
+                        gameState = GameStates.Playing;
+                    }
+                    break;
+                case GameStates.Playing:
+                    
+                    timeSinceLastInput += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
+                    if (timeSinceLastInput >= MinTimeSinceLastInput)
+                    {
+                        HandleMouseInput(Mouse.GetState());
+                    }
+
+                    gameBoard.ResetWater();
+
+                    for (int y = 0; y < GameBoard.GameBoardHeight; y++)
+                    {
+                        CheckScoringChain(gameBoard.GetWaterChain(y));
+                    }
+
+                    gameBoard.GenerateNewPieces(true);
+
+                    break;
+            }
 
 
             base.Update(gameTime);
@@ -153,6 +183,27 @@ namespace MGFloodControl
                             gameBoard.SetSquare((int)ScoringSquare.X, (int)ScoringSquare.Y, "Empty");
                         }
                     }
+                }
+            }
+        }
+
+        private void HandleMouseInput(MouseState mouseState)
+        {
+            int x = ((mouseState.X - (int)gameBoardDisplayOrigin.X) / GamePiece.PieceWidth);
+            int y = ((mouseState.Y - (int)gameBoardDisplayOrigin.Y) / GamePiece.PieceHeight);
+
+            if ((x >= 0) && (x < GameBoard.GameBoardWidth) && (y >= 0) && (y < GameBoard.GameBoardHeight))
+            {
+                if (mouseState.LeftButton == ButtonState.Pressed)
+                {
+                    gameBoard.RotatePiece(x, y, false);
+                    timeSinceLastInput = 0.0f;
+                }
+
+                if (mouseState.RightButton == ButtonState.Pressed)
+                {
+                    gameBoard.RotatePiece(x, y, true);
+                    timeSinceLastInput = 0.0f;
                 }
             }
         }
